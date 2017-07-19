@@ -2,9 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Title</title>
 </head>
 <body>
-$END$
+<script>
+    function getMultiKey (items, keys) {
+        var newArr = [];
+        if (angular.isArray(items)) {
+            newArr = [];
+            var key = null;
+            var obj = {};
+            for (var i = 0, len = items.length; i < len; i++) {
+                obj = {};
+                for (var j = 0, len1 = keys.length; j < len1; j++) {
+                    key = keys[j];
+                    if (items[i][key]) {
+                        obj[key] = items[i][key];
+                    }
+                }
+                newArr.push(obj);
+            }
+        } else {
+            newArr = [];
+            for (var key1 in keys) {
+                newArr.push(items[key1]);
+            }
+        }
+        return newArr;
+    }
+
+    function getKey(items, key) {
+        if (angular.isArray(items)) {
+            var newArr = [];
+            for (var i = 0; i < items.length; i++) {
+                if (items[i][key]) {
+                    newArr.push(items[i][key]);
+                }
+            }
+            return newArr;
+        } else {
+            return [items[key]];
+        }
+    }
+</script>
 </body>
 </html>
