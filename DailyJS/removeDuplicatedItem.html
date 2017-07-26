@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数组去重</title>
+</head>
+<body>
+<script>
+    // ng 数组去重
+    scope.removeDuplicatedItem = function (arr) {
+        var getArr = [];
+        angular.forEach(arr, function(item, key) {
+            if (getArr.indexOf(item.org_name) === -1) {
+                getArr.push(item.org_name);
+            }
+        });
+        return getArr;
+    };
+    scope.removeDuplicatedItem = function (arr) {
+        var getArr = [], objTemp = {};
+        angular.forEach(arr, function(item, key) {
+            if (!objTemp[item.org_name]) {
+                objTemp[item.org_name] = 1;
+                getArr.push(item);
+            }
+        });
+        return getArr;
+    };
+</script>
+</body>
+</html>
