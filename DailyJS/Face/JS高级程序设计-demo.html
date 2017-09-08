@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    /*JS高级程序设计》DEMO*/
+    //1：数组方法splice
+    var colors=["red","green","blue"];
+    var removed=colors.splice(0,1);//删除第一项
+    console.log(colors); //["green", "blue"]
+    console.log(removed); //["red"]返回的数组中只包含一项
+
+    removed=colors.splice(1,0,"yellow+1","orange");//从位置1开始插入两项
+    console.log(colors); //["green", "yellow+1", "orange", "blue"]
+    console.log(removed); //[]返回的是一个空数组
+
+    removed=colors.splice(1,1,"red","purple");//插入两项，删除一项
+    console.log(colors); //["green", "red", "purple", "orange", "blue"]
+    console.log(removed); //["yellow+1"]返回的数组中只包含一项
+
+
+    //2：数组迭代方法every some filter等
+    var numbers=[1,2,4,5,6,8,3,5];
+    var everyResult=numbers.every(function(item,index,array){
+        return (item>2)
+    })
+    console.log(everyResult); //false
+    var everyResult=numbers.some(function(item,index,array){
+        return (item>2)
+    })
+    console.log(everyResult);//true
+    var everyResult=numbers.filter(function(item,index,array){
+        return (item>2)
+    })
+    console.log(everyResult);//[4, 5, 6, 8, 3, 5]
+
+
+    // 3：函数内部属性
+    function outer(){
+        inner();
+    }
+    function inner() {
+        //console.log(inner.caller)当前函数的函数的引用
+        //或者  arguments.callee指向拥有arguments这个参数的函数
+        console.log(arguments.callee.caller)
+    }
+    outer();
+
+    // 4：原型与in操作符
+    function Person() {}
+    Person.prototype.name="Rui";
+    Person.prototype.age=24;
+    Person.prototype.job="webEn";
+    Person.prototype.sayHi=function () {
+       console.log(this.name)
+    }
+
+    var person1=new Person();
+    var person2=new Person();
+
+    console.log(person1.hasOwnProperty("name"));//false
+    console.log("name" in person1);//true
+
+    person1.name="sharon";
+    console.log(person1.name);//sharon--来自实例
+    console.log(person1.hasOwnProperty("name"));//true
+    console.log("name" in person1);//true
+
+    console.log(person2.name);//rui--来自原型
+    console.log(person2.hasOwnProperty("name"));//false
+    console.log("name" in person2);//true
+
+    delete  person1.name;
+    console.log(person1.name);//rui--来自原型
+    console.log(person1.hasOwnProperty("name"));//false
+    console.log("name" in person1);//true
+
+    //同时使用.hasOwnProperty和in判断属性是在对象中还是原型中
+    function hasPrototypeProperty(object,name) {
+        return !object.hasOwnProperty(name) &&(name in object)
+    }
+    var person=new Person();
+    console.log(hasPrototypeProperty(person,"name"))//true
+
+    person.name="rui2222";
+    console.log(hasPrototypeProperty(person,"name"))//false
+
+    //遍历可枚举属性Object.keys
+    var keys=Object.keys(Person.prototype)
+    console.log(keys);//["name", "age", "job", "sayHi"]
+    var p1=new Person();
+    p1.name="p1name";
+    p1.age=31;
+    var p1Keys=Object.keys(p1);
+    console.log(p1Keys);//["name", "age"]
+
+    //不论是否枚举，获取所有属性Object.getOwnPropertyNames
+    var key2=Object.getOwnPropertyNames(Person.prototype)
+    console.log(key2);//["constructor", "name", "age", "job", "sayHi"]
+
+    //更简单的原型语法---❤注意点：constructor
+    function Person(){}
+    Person.prototype={//对象字面量，但有一个例外就是constructor不再指向Person
+        //如果constructor真的很重要就add这一行 ：constructor：Person
+        // 原生的constructor不可枚举，添加这个后会使constructor变成可枚举的
+        name:"hello",
+        age:"23",
+        job:"web",
+        sayHi:function () {
+            console.log(this.name)
+        }
+    }
+    var friend=new Person();
+   // friend.sayHi();在已经创建了实例的情况下重写原型，会切断现有实例和新原型之间的联系
+    console.log(friend instanceof Object);//true
+    console.log(friend instanceof Person);//true
+    console.log(friend.constructor instanceof Person);//false
+    console.log(friend.constructor instanceof Object);//true
+
+    //原型对象的问题
+    function Person(){}
+    Person.prototype={
+        name:"hello",
+        age:"23",
+        job:"web",
+        friends:["tom","lily"],//add
+        sayHi:function () {
+            console.log(this.name)
+        }
+    }
+    var per1=new Person();
+    var per2=new Person();
+    per1.friends.push("sally");
+    console.log(per1.friends);//["tom", "lily", "sally"]
+    console.log(per2.friends);//["tom", "lily", "sally"]
+    console.log(per1.friends===per2.friends);//true
+
+
+    //组合使用构造模式和原型模式
+    function Person(name,age,job) {
+        this.name=name;
+        this.age=age;
+        this.job=job;
+        this.friends=["rui","liu"]
+    }
+    Person.prototype={
+        constructor:Person,
+        sayHi:function () {
+            console.log(this.name)
+        }
+    }
+    var person11=new Person("tom",24,"web");
+    var person22=new Person("lily",27,"fe");
+    person11.friends.push("sally");
+    console.log(person11.friends);//["rui", "liu", "sally"]
+    console.log(person22.friends);//["rui", "liu"]
+    console.log(person11.friends===person22.friends);//false
+    console.log(person11.sayHi===person22.sayHi);//true
+
+    // 动态原型模式
+    function Person(name,age,job) {
+        this.name=name;
+        this.age=age;
+        this.job=job;
+        if(typeof this.sayHi!="function"){
+            Person.prototype.sayHi=function () {
+                console.log(this.name)
+            }
+        }
+    }
+    var friend=new Person("sharon",24,"web");
+    friend.sayHi()
+    var friend1=new Person("sharon1",24,"web1");
+    friend1.sayHi()
+
+    //原型链
+    function SuperType(){
+        this.property=true;
+    }
+    SuperType.prototype.getSuperValue=function () {
+        return this.property
+    }
+    function SubType() {
+        this.subProperty=false;
+    }
+    SubType.prototype=new SuperType();//继承了superType
+    /*！！！原型链实现继承时，不能使用对象字面量创建原型方法，因为这样做会重写原型链。
+    * SubType.prototype={
+    *   getSubValue=function () {//添加新方法
+            return this.subProperty
+         }
+    * } */
+    SubType.prototype.getSubValue=function () {//添加新方法
+        return this.subProperty
+    }
+    SuperType.prototype.getSuperValue=function () {//重写超类型中的方法
+        return false
+    }
+    var instance=new SubType();
+    console.log(instance.getSuperValue());//false
+
+
+    //继承：借用构造函数
+    function SuperType(name){
+        this.name=name;
+    }
+    function SubType() {
+        SuperType.call(this,"kkk")
+        this.age=24
+    }
+    var ins=new SubType()
+    console.log(ins.name)
+    console.log(ins.age)
+
+    //继承：组合继承
+    function SuperType(name){
+        this.name=name;
+        this.colors=["red","blue","green"]
+    }
+
+    SuperType.prototype.sayHi=function () {
+        console.log(this.name)
+    }
+    function SubType(name,age) {
+        SuperType.call(this,name)
+        this.age=age
+    }
+    SubType.prototype=new SuperType();//继承了superType
+    SubType.prototype.sayAge=function () {
+        console.log(this.age)
+    }
+    var instance1=new SubType("lily",24);
+    instance1.colors.push("yellow")
+    console.log(instance1.colors)//["red", "blue", "green", "yellow"]
+    instance1.sayAge();//24
+    instance1.sayHi();//lily
+
+    var instance2=new SubType("lily2",28);
+    console.log(instance2.colors);//["red", "blue", "green"]
+    instance2.sayAge();//28
+    instance2.sayHi();//lily2
+
+    /*------------------------------------------------------------*/
+    
+    /*Ch7 函数表达式*/
+    function factorial(num) {
+        if(num<=1){
+            return 1;
+        }else{
+            //return num*factorial(num-1)
+            return num*arguments.callee(num-1)
+        }
+    }
+
+    //严格模式下
+    var factorial=(function f(num) {
+        if(num<=1){
+            return 1;
+        }else{
+            return num*f(num-1)
+        }
+    })
+    //闭包
+    //作用域链的副作用：闭包只能取得包含函数中任何变量的最后一个值
+    function createFunctions(){
+        var result=new Array();
+        for(var i=0;i<10;i++){
+          /*  result[i]=function () {
+                return i
+            }*/
+            result[i]=function (num) {
+                return function () {
+                    return num
+                }
+            }(i)
+        }
+        return result
+    }
+    createFunctions()
+
+    //关于this
+    var name="window";
+    var obj={
+        name:"object",
+        getName:function () {
+            //var that=this;
+            return function () {
+                //return that.name
+                return this.name
+            }
+        }
+    }
+    console.log(obj.getName()());//window
+
+
+    var name1="window";
+    var obj1={
+        name1:"object",
+        getName:function () {
+                return this.name
+        }
+    }
+   obj.getName();//object
+    (obj.getName)();//object
+    (obj.getName=obj.getName)();//window
+
+    //静态私有变量
+    (function () {
+        //私有变量和私有函数
+        var privateVariable=10;
+        function privateFunction() {
+            return false;
+        }
+        //构造函数
+        MyObject=function () {}
+        //公有/特权方法
+        MyObject.prototype.publicMethod=function () {
+            privateVariable++;
+            return privateFunction()
+        }
+    })()
+
+
+    //私有变量和函数由实例共享
+    (function () {
+        var name="";
+        var privateVariable=10;
+        Person=function (value) {
+            name=value
+        }
+        Person.prototype.getName=function () {
+            return name;
+        }
+        Person.prototype.setName=function (value) {
+            name=value
+        }
+
+        var person1=new Person("Nic");
+        console.log(person1.getName());//Nic
+        person1.setName("Nic-change")
+        console.log(person1.getName());//Nic-change
+
+        var person2=new Person("Microsh");
+        console.log(person1.getName());//Microsh
+        console.log(person2.getName());//Microsh
+    })()
+</script>
+</body>
+</html>
