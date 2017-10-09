@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Skills</title>
+</head>
+<body>
+<script>
+    // ❤：验证是否为数组: 先检验本地是否有Array.isArray函数，没有就执行后面的方法检测。
+    function isArray(obj){
+        return Array.isArray(obj) || Object.prototype.toString.call(obj) === '[object Array]'
+    }
+
+    // ❤：清空数组：方式三将一个新的数组的引用赋值给变量，其他引用并不受影响。 这意味着以前数组的内容被引用的话将依旧存在于内存中，这将导致内存泄漏。最高效的方法是第一种，所以推荐使用第一种方法清空数组
+    // 方式一 通过将长度设置为0
+    var arr = [1,2,3,4,5]
+    arr.length = 0
+    // 方式二 通过splice方法
+    arr.splice(0, arr.length)
+    // 方式三
+    arr = []
+
+
+    // ❤：打乱数组的顺序
+    // 方式一： 使用了数组的内置排序方法：sort
+    arr.sort(function () { return Math.random()-0.5 })
+    // 方式二： 借助了一个中间量，随机数组里的两个值，让它们交换位置。
+    function shuffle(arr) {
+        var i, 
+            j,
+            temp;
+        for (i = arr.length - 1; i > 0; i--) {
+            j = Math.floor(Math.random() * (i + 1));
+            temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+        return arr;    
+    };
+
+
+    // ❤：获取数组中的最大值或最小值：该方法适合一维或者多维数组。
+    function maxAndMin(arr){
+        return {
+        max: Math.max.apply(null,arr.join(',').split(',')),
+        min: Math.min.apply(null,arr.join(',').split(','))
+        }
+    }
+
+    // ❤：随机获取数组里的元素
+    function getRadomFromArr(arr){
+        return arr[Math.floor(Math.random()*arr.length)];
+    }
+
+    // ❤：从数组里查找指定的值：查到了返回true，没查到返回false。
+    function findInArr(arr, value){
+        for (var i=0; i<arr.length; i++){
+            if (arr[i] == value){
+                return true;
+            }
+        }	
+        return false;
+    }
+
+</script>
+</body>
+</html>
