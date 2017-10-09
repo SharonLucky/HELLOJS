@@ -26,6 +26,15 @@
         });
         return getArr;
     };
+
+    // ----------------------------------------------------
+    // ES6
+    Array.from(new Set(arr))
+
+    // ES5
+    arr.filter(function(ele, index, array){
+        return index===array.indexOf(ele)
+    })
 </script>
 </body>
 </html>
